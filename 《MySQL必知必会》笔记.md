@@ -1,4 +1,4 @@
-MySQL必知必会笔记
+**MySQL必知必会笔记**
 
 
 
@@ -7,8 +7,6 @@ MySQL shell 命令
 \sql    切换到sql，\js，切换到js
 
 \connect root@localhost:3306    本地连接
-
-
 
 ```mysql
 SHOW databases;  --查看数据库
@@ -23,19 +21,18 @@ CREATE TABLE costum(
 	id     int       NOT NULL AUTO_INCREMENT,
 	name   char(50)  NOT NULL,
 	age    int,
-	male   boolean   DEFAULT 0;
+	male   boolean   DEFAULT true,
 	resume TEXT,
-	PRIMARY KEY(id),           --主键可由多列组合，组合唯一即可     
+	PRIMARY KEY(id),             
 	FULLTEXT(resume)
-)ENGINE = MYIsAM;           --该引擎支持全文本搜索，不支持事务处理，InnoDB不支持全文搜索，支持事务处理
-
-RENAME TABLE costom TO costomer;
-ALTER TABLE costomer ADD province char(50);
-ALTER TABLE costomer DROP COLUMN province;
-DROP TABLE costom;
+)ENGINE = MYIsAM;           
+--主键可由多列组合，组合唯一即可     
+  --该引擎支持全文本搜索，不支持事务处理，InnoDB不支持全文搜索，支持事务处理
+RENAME TABLE costum TO costumer;
+ALTER TABLE costumer ADD province char(50);
+ALTER TABLE costumer DROP COLUMN province;
+DROP TABLE costumer;
 ```
-
-
 
 **查**
 
@@ -94,7 +91,7 @@ SELECT username FROM table1 UNION SELECT username FROM table2    --两个结果�
 **增**
 
 ```mysql
-INSERT INTO user(id,Username) VALUES((SELECT MAX(id) FROM user)+1,'xiaoming');
+INSERT INTO user(Username) VALUES('xiaoming');
 --若无null字段也可不写列名
 --插入多条记录
 INSERT INTO user(id,username) VALUES(1,'xiaoming'),(2,'xiaohong');
@@ -103,13 +100,13 @@ INSERT INTO user(username) SELECT student_name FROM students ;
 
 ```
 
-删
+**删**
 
 ```mysql
 DELETE FROM WHERE ...
 ```
 
-改
+**改**
 
 ```mysql
 UPDATE user SET username = 'xiaowang', age = '20' WHERE id = 5;
@@ -117,7 +114,7 @@ UPDATE user SET username = 'xiaowang', age = '20' WHERE id = 5;
 
 在一次更改多条记录时若不要原子性可在update后加ignore
 
-视图
+**视图**
 
 虚拟的表，由查询得到的结果集而来，一般只用于查询，以重用SQL语句，不对视图进行增删改
 
@@ -125,21 +122,21 @@ CREATE VIEW XXX AS SELECT......
 
 DROP VIEW XXX
 
-触发器
+**触发器**
 
 增删改操作的之前或后所触发的语句
 
-例如，在每插入一条记录之后查询新插入的用户名
+```mysql
+--在每插入一条记录之后查询新插入的用户名
+CREATE TRIGGER trigger1 AFTER INSERT ON user FOR EACH ROW 
+	SELECT NEW.username INTO @newuser;
 
-CREATE TRIGGER trigger1 AFTER INSERT ON user FOR EACH ROW SELECT NEW.username INTO @newuser;
+--删除之前把待删除的记录转到另一个表
+CREATE TRIGGER trigger2 BEFORE DELETE ON user FOR EACH ROW 
+	INSERT INTO olduser(username,age) VALUES(OLD.username,OLD.age);
+```
 
-删除之前把待删除的记录转到另一个表
-
-CREATE TRIGGER trigger2 BEFORE DELETE ON user FOR EACH ROW INSERT INTO olduser(username,age)
-
-VALUES(OLD.username,OLD.age);
-
-事务处理
+**事务处理**
 
 保证成批的操作要么全部执行要么全部不执行
 
